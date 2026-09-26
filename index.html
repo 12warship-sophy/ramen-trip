@@ -91,6 +91,13 @@
       });
     });
 
+    // 같은 도시 + 같은 날짜로 다시 "다음"을 누르면 새로 만들지 않고 기존 것을 이어서 연다.
+    function findExistingTrip(city, startDate, endDate) {
+      return getTrips().find(
+        (t) => t.city === city && t.startDate === startDate && t.endDate === endDate
+      );
+    }
+
     document.getElementById('trip-form').addEventListener('submit', (e) => {
       e.preventDefault();
       if (endInput.value < startInput.value) {
@@ -98,17 +105,31 @@
         return;
       }
       const opt = citySelect.selectedOptions[0];
+      const city = citySelect.value;
+      const startDate = startInput.value;
+      const endDate = endInput.value;
+
+      const existing = findExistingTrip(city, startDate, endDate);
+      if (existing) {
+        setCurrentTripId(existing.id);
+        location.href = `explore.html?trip=${existing.id}`;
+        return;
+      }
+
       const trip = createTrip({
-        city: citySelect.value,
+        city,
         cityName: opt.dataset.name,
-        startDate: startInput.value,
-        endDate: endInput.value,
+        startDate,
+        endDate,
       });
       location.href = `explore.html?trip=${trip.id}`;
     });
 
+    // 찜한 곳이 하나도 없고 일정도 안 만든, 그냥 "다음"만 눌러본 빈 계획은
+    // 홈 화면 목록에 쌓이지 않게 걸러낸다. (완전히 지워지는 건 아니라서
+    // 마이페이지에서는 계속 보이고, 필요하면 거기서 삭제할 수 있다.)
     function renderSavedTrips() {
-      const trips = getTrips();
+      const trips = getTrips().filter((t) => t.favorites.length > 0 || t.days.length > 0);
       if (!trips.length) {
         savedTripsEl.innerHTML = '<p class="empty-state">아직 저장된 가이드북이 없어요.<br />여행을 계획하고 첫 일정을 만들어보세요!</p>';
         return;
@@ -116,13 +137,30 @@
       savedTripsEl.innerHTML = trips
         .map(
           (t) => `
-        <a class="trip-card" href="itinerary.html?trip=${t.id}" style="display:block;">
-          <div class="trip-card-title">${t.cityName} ${t.days.length ? '' : '(계획 중)'}</div>
-          <div class="trip-card-dates">${t.startDate} ~ ${t.endDate} · 찜 ${t.favorites.length}곳</div>
-        </a>`
+        <div class="trip-card">
+          <a href="itinerary.html?trip=${t.id}" style="display:block;">
+            <div class="trip-card-title">${t.cityName} ${t.days.length ? '' : '(계획 중)'}</div>
+            <div class="trip-card-dates">${t.startDate} ~ ${t.endDate} · 찜 ${t.favorites.length}곳</div>
+          </a>
+          <div class="trip-card-actions">
+            <a href="itinerary.html?trip=${t.id}">열기</a>
+            <button data-delete="${t.id}">삭제</button>
+          </div>
+        </div>`
         )
         .join('');
     }
+
+    savedTripsEl.addEventListener('click', (e) => {
+      const deleteBtn = e.target.closest('[data-delete]');
+      if (!deleteBtn) return;
+      if (confirm('이 가이드북을 정말 지울까요?')) {
+        deleteTrip(deleteBtn.dataset.delete);
+        renderSavedTrips();
+        toast('가이드북을 삭제했어요');
+      }
+    });
+
     renderSavedTrips();
   </script>
 </body>
