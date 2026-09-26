@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-guidebook-v5';
+const CACHE_NAME = 'travel-guidebook-v6';
 
 const PRECACHE_URLS = [
   './',
