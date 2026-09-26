@@ -1,0 +1,19 @@
+{
+  "id": "./index.html",
+  "name": "세계 유명도시 여행 가이드북",
+  "short_name": "여행가이드북",
+  "description": "여행기간과 도시를 입력하면 숙소·맛집·명소를 추천하고 일정표를 자동으로 만들어주는 PWA",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf7f2",
+  "theme_color": "#9c7a45",
+  "lang": "ko",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

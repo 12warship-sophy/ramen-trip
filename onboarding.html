@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>
+    // 브라우저가 "설치 가능"으로 판단하면 이 이벤트가 아주 이른 시점에 발생하므로
+    // 다른 스크립트보다 먼저 걸어둔다. 기본 배너는 막고, 우리 버튼으로 직접 띄운다.
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.__deferredInstallPrompt = e;
+      window.dispatchEvent(new Event('pwa-install-available'));
+    });
+    window.addEventListener('appinstalled', () => {
+      window.__deferredInstallPrompt = null;
+      window.dispatchEvent(new Event('pwa-installed'));
+    });
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>세계 유명도시 여행 가이드북</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#9c7a45" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="여행가이드북" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="no-nav">
+  <main class="screen">
+    <div class="onboarding-hero">
+      <div class="emoji">🌍</div>
+      <h1>여행 준비, 한 번에 끝내기</h1>
+      <p>숙소·맛집·명소 추천부터 하루 단위 일정표 자동 생성까지,<br />여러 앱을 오가지 않아도 됩니다.</p>
+    </div>
+
+    <div class="card">
+      <p style="margin:0 0 6px;font-weight:700;">✓ 실사용자 후기 기반 추천</p>
+      <p style="margin:0 0 6px;font-weight:700;">✓ 숙소 4단계 가격·등급 필터</p>
+      <p style="margin:0;font-weight:700;">✓ 찜한 장소로 일정표 자동 완성</p>
+    </div>
+
+    <a href="./index.html" class="btn-primary" style="margin-top:20px;">시작하기</a>
+    <button id="install-btn" class="btn-outline" style="margin-top:12px;display:none;">📲 앱으로 설치하기</button>
+
+    <div id="ios-install-hint" class="ios-hint" style="display:none;">
+      <div class="ios-hint-row">
+        <svg class="ios-share-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 16V4" />
+          <path d="M7 9l5-5 5 5" />
+          <rect x="5" y="12" width="14" height="8" rx="2" />
+        </svg>
+        <span>하단 공유 버튼을 눌러 <strong>홈 화면에 추가</strong>하세요</span>
+      </div>
+      <div class="ios-hint-arrow">⬇</div>
+    </div>
+  </main>
+
+  <script src="./js/storage.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    function isIOS() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    }
+    function isSafariBrowser() {
+      const ua = navigator.userAgent;
+      return /^((?!chrome|android).)*safari/i.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+    }
+    function isStandaloneDisplay() {
+      return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    }
+
+    const installBtn = document.getElementById('install-btn');
+    const iosHint = document.getElementById('ios-install-hint');
+
+    function showInstallButtonIfReady() {
+      if (window.__deferredInstallPrompt) installBtn.style.display = 'inline-flex';
+    }
+
+    if (isStandaloneDisplay()) {
+      // 이미 앱으로 설치되어 실행 중이면 설치 안내가 필요 없다
+    } else if (isIOS() && isSafariBrowser()) {
+      // 아이폰 사파리는 beforeinstallprompt 자체를 지원하지 않으므로
+      // 공유 버튼으로 안내하는 문구를 대신 보여준다
+      iosHint.style.display = 'block';
+    } else {
+      showInstallButtonIfReady();
+      window.addEventListener('pwa-install-available', showInstallButtonIfReady);
+      window.addEventListener('pwa-installed', () => {
+        installBtn.style.display = 'none';
+        toast('설치되었어요! 홈 화면에서 바로 열 수 있어요');
+      });
+
+      installBtn.addEventListener('click', async () => {
+        const promptEvent = window.__deferredInstallPrompt;
+        if (!promptEvent) return;
+        installBtn.disabled = true;
+        promptEvent.prompt();
+        const { outcome } = await promptEvent.userChoice;
+        window.__deferredInstallPrompt = null;
+        installBtn.disabled = false;
+        if (outcome !== 'accepted') installBtn.style.display = 'none';
+      });
+    }
+  </script>
+</body>
+</html>

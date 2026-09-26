@@ -1,0 +1,5 @@
+[
+  { "id": "rome", "name": "로마", "country": "이탈리아" },
+  { "id": "paris", "name": "파리", "country": "프랑스" },
+  { "id": "tokyo", "name": "도쿄", "country": "일본" }
+]

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>마이페이지 · 세계 유명도시 여행 가이드북</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#9c7a45" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="여행가이드북" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="topbar-title">마이페이지</h1>
+  </header>
+
+  <main class="screen">
+    <div class="card" style="display:flex;align-items:center;gap:12px;">
+      <div class="place-thumb" style="font-size:32px;">🧳</div>
+      <div>
+        <p style="margin:0;font-weight:700;">여행자님</p>
+        <p style="margin:0;font-size:13px;color:#6b7280;" id="fav-summary">찜 0곳</p>
+      </div>
+    </div>
+
+    <div class="section-title">나의 가이드북</div>
+    <div id="trip-list"></div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span>🏠</span><span>홈</span></a>
+    <a href="explore.html" class="nav-item" data-trip-aware><span>🔍</span><span>탐색</span></a>
+    <a href="favorites.html" class="nav-item" data-trip-aware><span>♡</span><span>찜</span></a>
+    <a href="mypage.html" class="nav-item"><span>👤</span><span>마이페이지</span></a>
+  </nav>
+
+  <script src="./js/storage.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    const tripListEl = document.getElementById('trip-list');
+    const favSummaryEl = document.getElementById('fav-summary');
+
+    function render() {
+      const trips = getTrips();
+      const totalFav = trips.reduce((sum, t) => sum + t.favorites.length, 0);
+      favSummaryEl.textContent = `가이드북 ${trips.length}개 · 찜 ${totalFav}곳`;
+
+      if (!trips.length) {
+        tripListEl.innerHTML = '<p class="empty-state">아직 만든 가이드북이 없어요.<br /><a href="index.html">여행 계획 시작하기</a></p>';
+        return;
+      }
+
+      tripListEl.innerHTML = trips
+        .map(
+          (t) => `
+        <div class="trip-card">
+          <div class="trip-card-title">${t.cityName}</div>
+          <div class="trip-card-dates">${t.startDate} ~ ${t.endDate} · ${t.days.length ? '일정 완성' : '계획 중'} · 찜 ${t.favorites.length}곳</div>
+          <div class="trip-card-actions">
+            <a href="itinerary.html?trip=${t.id}" data-select="${t.id}">편집</a>
+            <button data-share="${t.id}">공유</button>
+            <button data-delete="${t.id}">삭제</button>
+          </div>
+        </div>`
+        )
+        .join('');
+    }
+
+    tripListEl.addEventListener('click', async (e) => {
+      const selectLink = e.target.closest('[data-select]');
+      if (selectLink) setCurrentTripId(selectLink.dataset.select);
+
+      const shareBtn = e.target.closest('[data-share]');
+      if (shareBtn) {
+        const url = `${location.origin}${location.pathname.replace('mypage.html', 'itinerary.html')}?trip=${shareBtn.dataset.share}`;
+        try {
+          await navigator.clipboard.writeText(url);
+        } catch {
+          /* clipboard unavailable, still show toast */
+        }
+        toast('가이드북 링크가 복사되었어요');
+      }
+
+      const deleteBtn = e.target.closest('[data-delete]');
+      if (deleteBtn) {
+        if (confirm('이 가이드북을 삭제할까요?')) {
+          deleteTrip(deleteBtn.dataset.delete);
+          render();
+          toast('가이드북을 삭제했어요');
+        }
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

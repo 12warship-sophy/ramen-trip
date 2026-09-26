@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>일정표 · 세계 유명도시 여행 가이드북</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#9c7a45" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="여행가이드북" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="no-nav">
+  <header class="topbar">
+    <button class="icon-btn" onclick="history.back()" aria-label="뒤로">←</button>
+    <div>
+      <h1 class="topbar-title" id="trip-title">일정표</h1>
+      <div class="topbar-sub" id="trip-sub"></div>
+    </div>
+    <button class="icon-btn" id="save-btn" aria-label="저장">저장</button>
+  </header>
+
+  <main class="screen" id="content"></main>
+
+  <script src="./js/storage.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/ramen-data.js"></script>
+  <script src="./js/resolve.js"></script>
+  <script src="./js/scheduler.js"></script>
+  <script src="./js/export.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    const tripId = qs('trip');
+    const trip = getTrip(tripId);
+    const content = document.getElementById('content');
+
+    if (!trip) {
+      content.innerHTML = '<p class="empty-state">여행 정보를 찾을 수 없어요.<br /><a href="index.html">홈으로 돌아가기</a></p>';
+    } else {
+    document.getElementById('trip-title').textContent = `${trip.cityName} 일정표`;
+    document.getElementById('trip-sub').textContent = formatDateRange(trip.startDate, trip.endDate);
+    document.getElementById('save-btn').addEventListener('click', () => {
+      saveTrip(trip);
+      toast('일정이 저장되었어요');
+    });
+
+    let activeDayIdx = 0;
+
+    function poolItems(resolved) {
+      const placed = placedIdsInDays(trip);
+      const all = [
+        ...resolved.attractions.map((p) => ({ ...p })),
+        ...resolved.restaurants.map((p) => ({ ...p })),
+        ...(resolved.ramens || []).map((p) => ({ ...p })),
+      ];
+      return all.filter((p) => !placed.has(`${p.type}:${p.id}`));
+    }
+
+    async function renderGenerateView() {
+      const resolved = await resolveFavorites(trip);
+      const favCount = trip.favorites.length;
+      content.innerHTML = `
+        <p style="font-size:14px;color:#6b7280;margin-bottom:16px;">
+          찜하신 ${favCount}곳(숙소 ${resolved.lodgings.length} · 맛집 ${resolved.restaurants.length} · 명소 ${resolved.attractions.length} · 라멘 ${(resolved.ramens || []).length})으로
+          하루 단위 일정표를 만들어드려요.
+        </p>
+        <button id="generate-btn" class="btn-primary" ${favCount ? '' : 'disabled'}>일정 생성하기</button>
+        ${favCount ? '' : '<p class="empty-state">먼저 탐색 화면에서 마음에 드는 장소를 찜해주세요.</p>'}
+        <a href="explore.html?trip=${trip.id}" class="btn-outline" style="margin-top:10px;display:block;text-align:center;">탐색하러 가기</a>
+      `;
+      document.getElementById('generate-btn')?.addEventListener('click', async () => {
+        const btn = document.getElementById('generate-btn');
+        btn.textContent = '일정을 만들고 있어요...';
+        btn.disabled = true;
+        const resolvedFresh = await resolveFavorites(trip);
+        trip.days = generateItinerary(trip, resolvedFresh);
+        saveTrip(trip);
+        activeDayIdx = 0;
+        renderScheduleView();
+      });
+    }
+
+    async function renderScheduleView() {
+      const resolved = await resolveFavorites(trip);
+      const pool = poolItems(resolved);
+      const day = trip.days[activeDayIdx];
+
+      const dayTabs = trip.days
+        .map((d, i) => `<button class="day-tab${i === activeDayIdx ? ' active' : ''}" data-day="${i}">Day${i + 1}</button>`)
+        .join('');
+
+      const items = day.items
+        .map(
+          (item, i) => `
+        <div class="timeline-item">
+          <span class="timeline-time">${item.time}</span>
+          <span class="timeline-name">${TYPE_ICON[item.type]} ${item.name}</span>
+          <span class="timeline-actions">
+            <button data-move="up" data-idx="${i}" ${i === 0 ? 'disabled' : ''} aria-label="위로">▲</button>
+            <button data-move="down" data-idx="${i}" ${i === day.items.length - 1 ? 'disabled' : ''} aria-label="아래로">▼</button>
+            <button data-remove="${i}" aria-label="삭제">🗑</button>
+          </span>
+        </div>`
+        )
+        .join('') || '<p class="empty-state">이 날은 아직 일정이 없어요. 아래에서 항목을 추가해보세요.</p>';
+
+      content.innerHTML = `
+        <div class="day-tabs">${dayTabs}</div>
+        ${day.lodging ? `<div class="lodging-note">🏨 숙소: ${day.lodging.name}</div>` : ''}
+        <div id="timeline">${items}</div>
+
+        <div class="add-item-row">
+          <select id="pool-select" ${pool.length ? '' : 'disabled'}>
+            ${pool.length ? pool.map((p) => `<option value="${p.type}:${p.id}">${TYPE_ICON[p.type]} ${p.name}</option>`).join('') : '<option>추가할 찜 항목이 없어요</option>'}
+          </select>
+          <button id="add-item-btn" class="btn-secondary" ${pool.length ? '' : 'disabled'}>+ 추가</button>
+        </div>
+
+        <button id="regenerate-btn" class="btn-outline" style="margin-bottom:20px;">🔁 일정 다시 생성하기</button>
+
+        <div class="section-title">가이드북 내보내기</div>
+        <div class="export-actions">
+          <button id="export-image" class="btn-secondary">🖼️ 이미지로 저장</button>
+          <button id="export-pdf" class="btn-secondary">📄 PDF로 내보내기</button>
+          <button id="export-link" class="btn-secondary">🔗 링크 복사</button>
+        </div>
+      `;
+
+      document.querySelectorAll('.day-tab').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          activeDayIdx = Number(btn.dataset.day);
+          renderScheduleView();
+        });
+      });
+
+      document.getElementById('timeline').addEventListener('click', (e) => {
+        const moveBtn = e.target.closest('[data-move]');
+        if (moveBtn) {
+          const idx = Number(moveBtn.dataset.idx);
+          const dir = moveBtn.dataset.move === 'up' ? -1 : 1;
+          const items = day.items;
+          [items[idx], items[idx + dir]] = [items[idx + dir], items[idx]];
+          reassignTimes(trip.days);
+          saveTrip(trip);
+          renderScheduleView();
+          return;
+        }
+        const removeBtn = e.target.closest('[data-remove]');
+        if (removeBtn) {
+          day.items.splice(Number(removeBtn.dataset.remove), 1);
+          reassignTimes(trip.days);
+          saveTrip(trip);
+          renderScheduleView();
+        }
+      });
+
+      document.getElementById('add-item-btn')?.addEventListener('click', () => {
+        const select = document.getElementById('pool-select');
+        const [type, id] = select.value.split(':');
+        const picked = pool.find((p) => p.type === type && p.id === id);
+        if (!picked) return;
+        day.items.push({ type, id, name: picked.name });
+        reassignTimes(trip.days);
+        saveTrip(trip);
+        renderScheduleView();
+      });
+
+      document.getElementById('regenerate-btn').addEventListener('click', async () => {
+        const resolvedFresh = await resolveFavorites(trip);
+        trip.days = generateItinerary(trip, resolvedFresh);
+        saveTrip(trip);
+        activeDayIdx = 0;
+        renderScheduleView();
+        toast('일정을 새로 만들었어요');
+      });
+
+      document.getElementById('export-image').addEventListener('click', exportAsPrint);
+      document.getElementById('export-pdf').addEventListener('click', () => {
+        toast("인쇄 대화상자에서 'PDF로 저장'을 선택하세요");
+        setTimeout(exportAsPrint, 400);
+      });
+      document.getElementById('export-link').addEventListener('click', async () => {
+        await copyShareLink();
+        toast('가이드북 링크가 복사되었어요');
+      });
+    }
+
+    if (trip.days.length) {
+      renderScheduleView();
+    } else {
+      renderGenerateView();
+    }
+    }
+  </script>
+</body>
+</html>

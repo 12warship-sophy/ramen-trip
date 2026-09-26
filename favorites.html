@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>찜 목록 · 세계 유명도시 여행 가이드북</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#9c7a45" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="여행가이드북" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="topbar-title" id="page-title">찜 목록</h1>
+  </header>
+
+  <main class="screen" id="content"></main>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span>🏠</span><span>홈</span></a>
+    <a href="explore.html" class="nav-item" data-trip-aware><span>🔍</span><span>탐색</span></a>
+    <a href="favorites.html" class="nav-item" data-trip-aware><span>♥</span><span>찜</span></a>
+    <a href="mypage.html" class="nav-item"><span>👤</span><span>마이페이지</span></a>
+  </nav>
+
+  <script src="./js/storage.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/ramen-data.js"></script>
+  <script src="./js/resolve.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    const tripId = qs('trip') || getCurrentTripId();
+    const trip = getTrip(tripId);
+    const content = document.getElementById('content');
+
+    if (!trip) {
+      content.innerHTML = '<p class="empty-state">먼저 홈에서 여행 계획을 시작해주세요.<br /><a href="index.html">홈으로 이동</a></p>';
+    } else {
+      document.getElementById('page-title').textContent = `${trip.cityName} 찜 목록`;
+      renderFavorites();
+    }
+
+    async function renderFavorites() {
+      const resolved = await resolveFavorites(trip);
+      const groups = [
+        { type: 'lodging', label: '숙소', items: resolved.lodgings },
+        { type: 'restaurant', label: '맛집', items: resolved.restaurants },
+        { type: 'attraction', label: '명소', items: resolved.attractions },
+        { type: 'ramen', label: '라멘', items: resolved.ramens },
+      ];
+
+      if (!trip.favorites.length) {
+        content.innerHTML = `
+          <p class="empty-state">아직 찜한 장소가 없어요.<br />탐색 화면에서 마음에 드는 곳을 찜해보세요.</p>
+          <a href="explore.html?trip=${trip.id}" class="btn-primary" style="margin-top:10px;display:block;text-align:center;">탐색하러 가기</a>
+        `;
+        return;
+      }
+
+      content.innerHTML = groups
+        .map((g) => {
+          if (!g.items.length) return '';
+          return `
+            <div class="section-title">${g.label} (${g.items.length})</div>
+            ${g.items
+              .map((item) => {
+                const meta = g.type === 'ramen'
+                  ? `<span class="badge">${item.genre || ''}</span><span>${item.priceRange || ''}</span>`
+                  : `<span>★ ${item.rating} (${item.reviewCount})</span>`;
+                const name = g.type === 'ramen' ? item.nameKo : item.name;
+                return `
+              <div class="place-card" data-type="${g.type}" data-id="${item.id}">
+                <div class="place-thumb">${TYPE_ICON[g.type]}</div>
+                <div class="place-info" data-open="${item.id}" data-type-open="${g.type}">
+                  <p class="place-name">${name}</p>
+                  <div class="place-meta">${meta}</div>
+                </div>
+                <button class="fav-btn" data-remove="${item.id}" data-type-remove="${g.type}" aria-label="찜 해제">♥</button>
+              </div>`;
+              })
+              .join('')}
+          `;
+        })
+        .join('');
+    }
+
+    content.addEventListener('click', (e) => {
+      const removeBtn = e.target.closest('[data-remove]');
+      if (removeBtn) {
+        toggleFavorite(trip, removeBtn.dataset.typeRemove, removeBtn.dataset.remove);
+        toast('찜 목록에서 제거했어요');
+        renderFavorites();
+        return;
+      }
+      const open = e.target.closest('[data-open]');
+      if (open) {
+        location.href = `detail.html?trip=${trip.id}&type=${open.dataset.typeOpen}&id=${open.dataset.open}`;
+      }
+    });
+  </script>
+</body>
+</html>

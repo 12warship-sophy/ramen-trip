@@ -1,0 +1,110 @@
+[
+  {
+    "id": "lod-rome-1", "city": "rome", "name": "로마 콜로세오 럭셔리 스위트", "priceTier": "럭셔리",
+    "pricePerNight": 450000, "rating": 4.8, "reviewCount": 210, "lat": 41.8905, "lng": 12.4930,
+    "description": "콜로세움 도보 3분 거리의 5성급 스위트 호텔.",
+    "reviews": [
+      { "author": "방문자 A", "date": "2026-07-10", "verified": true, "content": "루프탑에서 콜로세움 야경이 보여서 감동이었어요." },
+      { "author": "방문자 B", "date": "2026-05-02", "verified": true, "content": "서비스가 최고급이고 조식이 훌륭합니다." }
+    ]
+  },
+  {
+    "id": "lod-rome-2", "city": "rome", "name": "판테온 부티크 호텔", "priceTier": "고급",
+    "pricePerNight": 220000, "rating": 4.6, "reviewCount": 340, "lat": 41.8990, "lng": 12.4770,
+    "description": "판테온 인근의 아늑한 부티크 호텔.",
+    "reviews": [
+      { "author": "방문자 C", "date": "2026-04-20", "verified": true, "content": "위치가 정말 좋아서 도보로 다 다녔어요." },
+      { "author": "방문자 D", "date": "2026-06-11", "verified": true, "content": "객실은 작지만 인테리어가 예뻐요." }
+    ]
+  },
+  {
+    "id": "lod-rome-3", "city": "rome", "name": "트라스테베레 시티 호텔", "priceTier": "일반",
+    "pricePerNight": 120000, "rating": 4.4, "reviewCount": 410, "lat": 41.8899, "lng": 12.4692,
+    "description": "현지 분위기를 느낄 수 있는 트라스테베레 지역 호텔.",
+    "reviews": [
+      { "author": "방문자 E", "date": "2026-03-15", "verified": true, "content": "동네 자체가 예쁘고 저녁에 산책하기 좋아요." },
+      { "author": "방문자 F", "date": "2026-08-03", "verified": true, "content": "가성비 대비 만족스러운 숙소였어요." }
+    ]
+  },
+  {
+    "id": "lod-rome-4", "city": "rome", "name": "테르미니 백패커스 호스텔", "priceTier": "가성비",
+    "pricePerNight": 45000, "rating": 4.2, "reviewCount": 512, "lat": 41.9010, "lng": 12.5015,
+    "description": "테르미니역 근처, 배낭여행자에게 인기인 호스텔.",
+    "reviews": [
+      { "author": "방문자 G", "date": "2026-02-22", "verified": true, "content": "역에서 가까워서 이동이 정말 편했어요." },
+      { "author": "방문자 H", "date": "2026-07-30", "verified": true, "content": "가격 대비 깨끗하고 스태프가 친절해요." }
+    ]
+  },
+  {
+    "id": "lod-paris-1", "city": "paris", "name": "샹젤리제 팰리스 호텔", "priceTier": "럭셔리",
+    "pricePerNight": 520000, "rating": 4.9, "reviewCount": 180, "lat": 48.8698, "lng": 2.3078,
+    "description": "샹젤리제 거리에 위치한 5성급 팰리스 호텔.",
+    "reviews": [
+      { "author": "방문자 A", "date": "2026-06-05", "verified": true, "content": "직원들이 정말 세심하게 챙겨줘서 감동이었습니다." },
+      { "author": "방문자 B", "date": "2026-05-19", "verified": true, "content": "스파 시설이 훌륭해요." }
+    ]
+  },
+  {
+    "id": "lod-paris-2", "city": "paris", "name": "마레지구 부티크 호텔", "priceTier": "고급",
+    "pricePerNight": 260000, "rating": 4.6, "reviewCount": 300, "lat": 48.8575, "lng": 2.3622,
+    "description": "감각적인 상점이 많은 마레지구의 부티크 호텔.",
+    "reviews": [
+      { "author": "방문자 C", "date": "2026-04-08", "verified": true, "content": "골목 분위기가 좋고 카페가 근처에 많아요." },
+      { "author": "방문자 D", "date": "2026-07-14", "verified": true, "content": "객실 디자인이 감각적이에요." }
+    ]
+  },
+  {
+    "id": "lod-paris-3", "city": "paris", "name": "몽파르나스 시티 호텔", "priceTier": "일반",
+    "pricePerNight": 130000, "rating": 4.3, "reviewCount": 380, "lat": 48.8422, "lng": 2.3219,
+    "description": "교통이 편리한 몽파르나스역 인근 호텔.",
+    "reviews": [
+      { "author": "방문자 E", "date": "2026-03-27", "verified": true, "content": "지하철역이 바로 앞이라 이동이 편했어요." },
+      { "author": "방문자 F", "date": "2026-08-18", "verified": true, "content": "무난하고 깔끔한 숙소였습니다." }
+    ]
+  },
+  {
+    "id": "lod-paris-4", "city": "paris", "name": "생라자르 백패커스 호스텔", "priceTier": "가성비",
+    "pricePerNight": 50000, "rating": 4.1, "reviewCount": 470, "lat": 48.8757, "lng": 2.3244,
+    "description": "역 근처의 저렴하고 활기찬 호스텔.",
+    "reviews": [
+      { "author": "방문자 G", "date": "2026-02-09", "verified": true, "content": "다른 여행자들과 친해지기 좋은 분위기예요." },
+      { "author": "방문자 H", "date": "2026-06-29", "verified": true, "content": "가격이 저렴한 것에 비해 시설이 괜찮아요." }
+    ]
+  },
+  {
+    "id": "lod-tokyo-1", "city": "tokyo", "name": "긴자 럭셔리 리조트", "priceTier": "럭셔리",
+    "pricePerNight": 480000, "rating": 4.8, "reviewCount": 240, "lat": 35.6717, "lng": 139.7650,
+    "description": "긴자 쇼핑가에 위치한 프리미엄 리조트 호텔.",
+    "reviews": [
+      { "author": "방문자 A", "date": "2026-05-11", "verified": true, "content": "객실 뷰가 최고이고 조식 뷔페가 다양해요." },
+      { "author": "방문자 B", "date": "2026-07-21", "verified": true, "content": "쇼핑하기 정말 편한 위치입니다." }
+    ]
+  },
+  {
+    "id": "lod-tokyo-2", "city": "tokyo", "name": "신주쿠 부티크 호텔", "priceTier": "고급",
+    "pricePerNight": 240000, "rating": 4.5, "reviewCount": 320, "lat": 35.6938, "lng": 139.7034,
+    "description": "번화가 신주쿠 중심의 감각적인 호텔.",
+    "reviews": [
+      { "author": "방문자 C", "date": "2026-04-02", "verified": true, "content": "야경 명소들이 가까워서 밤에도 다니기 좋아요." },
+      { "author": "방문자 D", "date": "2026-06-17", "verified": true, "content": "방음이 잘 되어 있어서 편하게 잤어요." }
+    ]
+  },
+  {
+    "id": "lod-tokyo-3", "city": "tokyo", "name": "아사쿠사 시티 호텔", "priceTier": "일반",
+    "pricePerNight": 110000, "rating": 4.3, "reviewCount": 390, "lat": 35.7118, "lng": 139.7966,
+    "description": "센소지 인근 전통적인 분위기의 호텔.",
+    "reviews": [
+      { "author": "방문자 E", "date": "2026-03-09", "verified": true, "content": "센소지까지 걸어서 5분이라 좋았어요." },
+      { "author": "방문자 F", "date": "2026-08-22", "verified": true, "content": "다다미방이 특색 있고 편안했습니다." }
+    ]
+  },
+  {
+    "id": "lod-tokyo-4", "city": "tokyo", "name": "이케부쿠로 게스트하우스", "priceTier": "가성비",
+    "pricePerNight": 42000, "rating": 4.0, "reviewCount": 460, "lat": 35.7295, "lng": 139.7109,
+    "description": "합리적인 가격의 게스트하우스, 대중교통 접근성이 좋음.",
+    "reviews": [
+      { "author": "방문자 G", "date": "2026-02-16", "verified": true, "content": "저렴한데 위치가 생각보다 좋았어요." },
+      { "author": "방문자 H", "date": "2026-07-02", "verified": true, "content": "공용 라운지가 있어서 정보 교환하기 좋아요." }
+    ]
+  }
+]

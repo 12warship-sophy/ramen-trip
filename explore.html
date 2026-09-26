@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>탐색 · 세계 유명도시 여행 가이드북</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#9c7a45" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="여행가이드북" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <button class="icon-btn" onclick="history.back()" aria-label="뒤로">←</button>
+    <div>
+      <h1 class="topbar-title" id="trip-title">탐색</h1>
+      <div class="topbar-sub" id="trip-sub"></div>
+    </div>
+  </header>
+
+  <main class="screen">
+    <div class="tabs">
+      <button class="tab-btn" data-tab="lodging">숙소</button>
+      <button class="tab-btn" data-tab="restaurant">맛집</button>
+      <button class="tab-btn" data-tab="attraction">명소</button>
+      <button class="tab-btn" data-tab="ramen">라멘</button>
+    </div>
+
+    <div class="filter-bar" id="filter-bar"></div>
+
+    <div id="place-list"></div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span>🏠</span><span>홈</span></a>
+    <a href="explore.html" class="nav-item" data-trip-aware><span>🔍</span><span>탐색</span></a>
+    <a href="favorites.html" class="nav-item" data-trip-aware><span>♡</span><span>찜</span></a>
+    <a href="mypage.html" class="nav-item"><span>👤</span><span>마이페이지</span></a>
+  </nav>
+
+  <script src="./js/storage.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/filter.js"></script>
+  <script src="./js/ramen-data.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    const tripId = qs('trip');
+    const trip = getTrip(tripId);
+
+    if (!trip) {
+      document.querySelector('main').innerHTML =
+        '<p class="empty-state">여행 정보를 찾을 수 없어요.<br /><a href="index.html">홈으로 돌아가기</a></p>';
+    } else {
+    document.getElementById('trip-title').textContent = `${trip.cityName} 탐색`;
+    document.getElementById('trip-sub').textContent = formatDateRange(trip.startDate, trip.endDate);
+
+    const FILTERS = {
+      lodging: [
+        { key: 'tier', label: '전체 등급', options: ['럭셔리', '고급', '일반', '가성비'] },
+      ],
+      restaurant: [
+        { key: 'genre', label: '전체 장르', options: ['한식', '양식', '일식', '카페'] },
+        { key: 'capacity', label: '전체 인원', options: ['1-2인', '3-4인', '5인 이상'] },
+      ],
+      attraction: [
+        { key: 'category', label: '전체 카테고리', options: ['역사', '자연경관', '체험시설'] },
+      ],
+      ramen: [
+        { key: 'genre', label: '전체 종류', options: [...new Set(RAMEN_SHOPS.map((r) => r.genre).filter(Boolean))] },
+        { key: 'capacity', label: '전체 인원', options: ['1-2인', '3-4인', '5인 이상'] },
+        { key: 'waiting', label: '전체 웨이팅', options: [...new Set(RAMEN_SHOPS.map((r) => r.waiting).filter(Boolean))] },
+        { key: 'seatType', label: '전체 좌석', options: [...new Set(RAMEN_SHOPS.map((r) => r.seatType).filter(Boolean))] },
+      ],
+    };
+
+    const DATA_FILE = { lodging: 'lodgings', restaurant: 'restaurants', attraction: 'attractions' };
+    const SAMPLE_TYPES = new Set(['lodging', 'restaurant', 'attraction']);
+
+    let currentTab = qs('tab') || 'lodging';
+    const filterState = { lodging: {}, restaurant: {}, attraction: {}, ramen: {} };
+
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const filterBar = document.getElementById('filter-bar');
+    const placeList = document.getElementById('place-list');
+
+    function renderTabs() {
+      tabButtons.forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === currentTab));
+    }
+
+    function renderFilterBar() {
+      const defs = FILTERS[currentTab].filter((f) => f.options.length > 0);
+      filterBar.innerHTML = defs
+        .map(
+          (f) => `
+        <select data-key="${f.key}">
+          <option value="all">${f.label}</option>
+          ${f.options.map((o) => `<option value="${o}">${o}</option>`).join('')}
+        </select>`
+        )
+        .join('');
+    }
+
+    function renderRamenList() {
+      if (!RAMEN_SHOPS.length) {
+        placeList.innerHTML = '<p class="empty-state">🍜 제보를 모으는 중이에요.<br />친구들의 찐 라멘맛집 제보가 모이면 여기에 채워집니다.</p>';
+        return;
+      }
+      const params = { city: trip.city, ...filterState.ramen };
+      const filtered = filterRamen(RAMEN_SHOPS, params);
+      if (!filtered.length) {
+        placeList.innerHTML = '<p class="empty-state">조건에 맞는 라멘집이 없어요. 필터를 조정해보세요.</p>';
+        return;
+      }
+      placeList.innerHTML = filtered
+        .map((item) => {
+          const fav = isFavorite(trip, 'ramen', item.id);
+          const nickname = item.showNickname && item.recommenderNickname ? item.recommenderNickname : '익명 오타쿠';
+          const stale = isStaleVisit(item.lastVisited);
+          return `
+          <div class="place-card" data-id="${item.id}">
+            <div class="place-thumb">${TYPE_ICON.ramen}</div>
+            <div class="place-info" data-open="${item.id}">
+              <p class="place-name">${item.nameKo} <span style="color:var(--color-text-muted);font-weight:400;">${item.nameJa || ''}</span></p>
+              <div class="place-meta">
+                <span class="badge">${item.genre || ''}</span>
+                <span>${item.priceRange || ''}</span>
+                ${item.waiting ? `<span>웨이팅 ${item.waiting}</span>` : ''}
+                ${stale ? '<span class="badge badge-warn">정보 확인 필요</span>' : ''}
+              </div>
+              <div class="place-meta" style="margin-top:4px;">
+                <span>짠맛 ${barIndicator(item.saltiness)}</span>
+                <span>진한맛 ${barIndicator(item.richness)}</span>
+              </div>
+              <div class="place-meta" style="margin-top:4px;">
+                <span class="badge badge-rec">${nickname}님 추천</span>
+              </div>
+            </div>
+            <button class="fav-btn" data-fav="${item.id}" aria-label="찜하기">${fav ? '♥' : '♡'}</button>
+          </div>`;
+        })
+        .join('');
+    }
+
+    async function renderList() {
+      if (currentTab === 'ramen') {
+        renderRamenList();
+        return;
+      }
+
+      const list = await loadData(DATA_FILE[currentTab]);
+      const params = { city: trip.city, ...filterState[currentTab] };
+      let filtered = [];
+      if (currentTab === 'lodging') filtered = filterLodgings(list, params);
+      if (currentTab === 'restaurant') filtered = filterRestaurants(list, params);
+      if (currentTab === 'attraction') filtered = filterAttractions(list, params);
+
+      if (!filtered.length) {
+        placeList.innerHTML = '<p class="empty-state">조건에 맞는 장소가 없어요. 필터를 조정해보세요.</p>';
+        return;
+      }
+
+      placeList.innerHTML = filtered
+        .map((item) => {
+          const fav = isFavorite(trip, currentTab, item.id);
+          const badge =
+            currentTab === 'lodging'
+              ? item.priceTier
+              : currentTab === 'restaurant'
+              ? `${item.genre} · ${item.capacity}`
+              : item.category;
+          return `
+          <div class="place-card" data-id="${item.id}">
+            <div class="place-thumb">${TYPE_ICON[currentTab]}</div>
+            <div class="place-info" data-open="${item.id}">
+              <p class="place-name">${item.name} ${SAMPLE_TYPES.has(currentTab) ? '<span class="sample-tag">샘플 데이터</span>' : ''}</p>
+              <div class="place-meta">
+                <span class="badge">${badge}</span>
+                <span>★ ${item.rating} (${item.reviewCount})</span>
+              </div>
+            </div>
+            <button class="fav-btn" data-fav="${item.id}" aria-label="찜하기">${fav ? '♥' : '♡'}</button>
+          </div>`;
+        })
+        .join('');
+    }
+
+    filterBar.addEventListener('change', (e) => {
+      const key = e.target.dataset.key;
+      filterState[currentTab][key] = e.target.value;
+      renderList();
+    });
+
+    tabButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        currentTab = btn.dataset.tab;
+        renderTabs();
+        renderFilterBar();
+        renderList();
+      });
+    });
+
+    placeList.addEventListener('click', (e) => {
+      const favBtn = e.target.closest('[data-fav]');
+      if (favBtn) {
+        toggleFavorite(trip, currentTab, favBtn.dataset.fav);
+        renderList();
+        return;
+      }
+      const open = e.target.closest('[data-open]');
+      if (open) {
+        location.href = `detail.html?trip=${trip.id}&type=${currentTab}&id=${open.dataset.open}`;
+      }
+    });
+
+    renderTabs();
+    renderFilterBar();
+    renderList();
+    }
+  </script>
+</body>
+</html>

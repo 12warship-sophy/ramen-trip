@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>홈 · 세계 유명도시 여행 가이드북</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#9c7a45" />
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="여행가이드북" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <main class="screen">
+    <h2 style="margin:6px 0 18px;">안녕하세요 👋<br />어디로 떠나시나요?</h2>
+
+    <form id="trip-form">
+      <div class="field">
+        <label for="city-select">방문 도시</label>
+        <select id="city-select" required></select>
+      </div>
+
+      <div class="chip-row" id="city-chips"></div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="start-date">출발일</label>
+          <input type="date" id="start-date" required />
+        </div>
+        <div class="field">
+          <label for="end-date">도착일</label>
+          <input type="date" id="end-date" required />
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary">다음</button>
+    </form>
+
+    <div class="section-title">저장한 가이드북</div>
+    <div id="saved-trips"></div>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span>🏠</span><span>홈</span></a>
+    <a href="explore.html" class="nav-item" data-trip-aware><span>🔍</span><span>탐색</span></a>
+    <a href="favorites.html" class="nav-item" data-trip-aware><span>♡</span><span>찜</span></a>
+    <a href="mypage.html" class="nav-item"><span>👤</span><span>마이페이지</span></a>
+  </nav>
+
+  <script src="./js/storage.js"></script>
+  <script src="./js/cities-data.js"></script>
+  <script src="./js/app.js"></script>
+  <script>
+    const citySelect = document.getElementById('city-select');
+    const cityChips = document.getElementById('city-chips');
+    const startInput = document.getElementById('start-date');
+    const endInput = document.getElementById('end-date');
+    const savedTripsEl = document.getElementById('saved-trips');
+
+    function todayPlus(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return d.toISOString().slice(0, 10);
+    }
+    startInput.value = todayPlus(14);
+    endInput.value = todayPlus(19);
+
+    const cities = CITIES;
+    citySelect.innerHTML = cities
+      .map((c) => `<option value="${c.id}" data-name="${c.name}">${c.name} (${c.country})</option>`)
+      .join('');
+
+    cityChips.innerHTML = cities
+      .map((c, i) => `<button type="button" class="chip${i === 0 ? ' active' : ''}" data-city="${c.id}">${c.name}</button>`)
+      .join('');
+
+    cityChips.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      citySelect.value = btn.dataset.city;
+      cityChips.querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
+      btn.classList.add('active');
+    });
+
+    citySelect.addEventListener('change', () => {
+      cityChips.querySelectorAll('.chip').forEach((c) => {
+        c.classList.toggle('active', c.dataset.city === citySelect.value);
+      });
+    });
+
+    document.getElementById('trip-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (endInput.value < startInput.value) {
+        alert('도착일은 출발일 이후여야 합니다.');
+        return;
+      }
+      const opt = citySelect.selectedOptions[0];
+      const trip = createTrip({
+        city: citySelect.value,
+        cityName: opt.dataset.name,
+        startDate: startInput.value,
+        endDate: endInput.value,
+      });
+      location.href = `explore.html?trip=${trip.id}`;
+    });
+
+    function renderSavedTrips() {
+      const trips = getTrips();
+      if (!trips.length) {
+        savedTripsEl.innerHTML = '<p class="empty-state">아직 저장된 가이드북이 없어요.<br />여행을 계획하고 첫 일정을 만들어보세요!</p>';
+        return;
+      }
+      savedTripsEl.innerHTML = trips
+        .map(
+          (t) => `
+        <a class="trip-card" href="itinerary.html?trip=${t.id}" style="display:block;">
+          <div class="trip-card-title">${t.cityName} ${t.days.length ? '' : '(계획 중)'}</div>
+          <div class="trip-card-dates">${t.startDate} ~ ${t.endDate} · 찜 ${t.favorites.length}곳</div>
+        </a>`
+        )
+        .join('');
+    }
+    renderSavedTrips();
+  </script>
+</body>
+</html>

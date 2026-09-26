@@ -1,0 +1,110 @@
+[
+  {
+    "id": "att-rome-1", "city": "rome", "name": "콜로세움", "category": "역사",
+    "rating": 4.7, "reviewCount": 1200, "lat": 41.8902, "lng": 12.4922,
+    "description": "고대 로마의 원형 경기장. 로마 여행 필수 코스.",
+    "reviews": [
+      { "author": "방문자 A", "date": "2026-07-02", "verified": true, "content": "규모가 압도적이고 오디오 가이드가 도움이 많이 됐어요." },
+      { "author": "방문자 B", "date": "2026-05-14", "verified": true, "content": "아침 일찍 가면 줄이 짧아요. 강력 추천." }
+    ]
+  },
+  {
+    "id": "att-rome-2", "city": "rome", "name": "트레비 분수", "category": "역사",
+    "rating": 4.6, "reviewCount": 980, "lat": 41.9009, "lng": 12.4833,
+    "description": "동전을 던지면 로마에 다시 온다는 전설이 있는 바로크 양식 분수.",
+    "reviews": [
+      { "author": "방문자 C", "date": "2026-06-20", "verified": true, "content": "야경이 특히 예뻐요. 사람이 정말 많으니 참고하세요." },
+      { "author": "방문자 D", "date": "2026-04-11", "verified": true, "content": "생각보다 크고 화려해서 놀랐습니다." }
+    ]
+  },
+  {
+    "id": "att-rome-3", "city": "rome", "name": "판테온", "category": "역사",
+    "rating": 4.6, "reviewCount": 870, "lat": 41.8986, "lng": 12.4769,
+    "description": "2000년 가까이 원형을 유지하고 있는 고대 로마 신전.",
+    "reviews": [
+      { "author": "방문자 E", "date": "2026-03-05", "verified": true, "content": "무료 입장이라 부담 없이 들를 수 있어요." },
+      { "author": "방문자 F", "date": "2026-08-01", "verified": true, "content": "천장 오큘러스로 들어오는 빛이 인상적이에요." }
+    ]
+  },
+  {
+    "id": "att-rome-4", "city": "rome", "name": "보르게세 공원", "category": "자연경관",
+    "rating": 4.5, "reviewCount": 430, "lat": 41.9142, "lng": 12.4923,
+    "description": "로마 시내를 벗어나 산책하기 좋은 넓은 공원.",
+    "reviews": [
+      { "author": "방문자 G", "date": "2026-07-19", "verified": true, "content": "돗자리 펴고 쉬기 좋고 미술관도 함께 볼 수 있어요." },
+      { "author": "방문자 H", "date": "2026-02-27", "verified": true, "content": "자전거 대여소가 있어서 편하게 둘러봤어요." }
+    ]
+  },
+  {
+    "id": "att-paris-1", "city": "paris", "name": "에펠탑", "category": "역사",
+    "rating": 4.7, "reviewCount": 2000, "lat": 48.8584, "lng": 2.2945,
+    "description": "파리를 상징하는 랜드마크 철탑.",
+    "reviews": [
+      { "author": "방문자 A", "date": "2026-06-02", "verified": true, "content": "야간 조명쇼가 매시 정각에 열려요. 꼭 챙겨보세요." },
+      { "author": "방문자 B", "date": "2026-05-22", "verified": true, "content": "전망대 티켓은 미리 예매하는 걸 추천합니다." }
+    ]
+  },
+  {
+    "id": "att-paris-2", "city": "paris", "name": "루브르 박물관", "category": "체험시설",
+    "rating": 4.8, "reviewCount": 1800, "lat": 48.8606, "lng": 2.3376,
+    "description": "모나리자를 비롯한 명화가 있는 세계 최대 규모 박물관.",
+    "reviews": [
+      { "author": "방문자 C", "date": "2026-04-30", "verified": true, "content": "동선이 넓어서 반나절은 잡고 가야 해요." },
+      { "author": "방문자 D", "date": "2026-07-08", "verified": true, "content": "온라인 예매하면 대기 없이 바로 입장 가능했어요." }
+    ]
+  },
+  {
+    "id": "att-paris-3", "city": "paris", "name": "몽마르뜨 언덕", "category": "자연경관",
+    "rating": 4.6, "reviewCount": 760, "lat": 48.8867, "lng": 2.3431,
+    "description": "파리 시내가 한눈에 보이는 언덕과 사크레쾨르 대성당.",
+    "reviews": [
+      { "author": "방문자 E", "date": "2026-03-18", "verified": true, "content": "골목 화가들 구경하는 재미가 있어요." },
+      { "author": "방문자 F", "date": "2026-08-09", "verified": true, "content": "해질녘 뷰가 정말 예뻤습니다." }
+    ]
+  },
+  {
+    "id": "att-paris-4", "city": "paris", "name": "센 강 유람선", "category": "체험시설",
+    "rating": 4.5, "reviewCount": 540, "lat": 48.8566, "lng": 2.3376,
+    "description": "센 강을 따라 파리 명소를 감상하는 크루즈.",
+    "reviews": [
+      { "author": "방문자 G", "date": "2026-06-14", "verified": true, "content": "야간 크루즈에서 보는 에펠탑 조명이 최고예요." },
+      { "author": "방문자 H", "date": "2026-01-30", "verified": true, "content": "1시간 코스로 부담 없이 즐기기 좋아요." }
+    ]
+  },
+  {
+    "id": "att-tokyo-1", "city": "tokyo", "name": "센소지", "category": "역사",
+    "rating": 4.6, "reviewCount": 1500, "lat": 35.7148, "lng": 139.7967,
+    "description": "도쿄에서 가장 오래된 사찰과 나카미세 거리.",
+    "reviews": [
+      { "author": "방문자 A", "date": "2026-05-03", "verified": true, "content": "나카미세 거리 먹거리가 다양해서 좋았어요." },
+      { "author": "방문자 B", "date": "2026-07-27", "verified": true, "content": "기모노 대여해서 사진 찍기 좋은 장소예요." }
+    ]
+  },
+  {
+    "id": "att-tokyo-2", "city": "tokyo", "name": "시부야 스크램블", "category": "체험시설",
+    "rating": 4.5, "reviewCount": 1100, "lat": 35.6595, "lng": 139.7005,
+    "description": "세계에서 가장 붐비는 횡단보도로 유명한 도쿄의 상징.",
+    "reviews": [
+      { "author": "방문자 C", "date": "2026-04-16", "verified": true, "content": "스타벅스 2층에서 내려다보는 뷰가 유명해요." },
+      { "author": "방문자 D", "date": "2026-06-25", "verified": true, "content": "밤에 네온사인과 함께 보면 더 멋져요." }
+    ]
+  },
+  {
+    "id": "att-tokyo-3", "city": "tokyo", "name": "우에노 공원", "category": "자연경관",
+    "rating": 4.4, "reviewCount": 600, "lat": 35.7156, "lng": 139.7745,
+    "description": "박물관과 동물원이 모여있는 대형 공원.",
+    "reviews": [
+      { "author": "방문자 E", "date": "2026-03-30", "verified": true, "content": "벚꽃 시즌엔 정말 사람이 많아요." },
+      { "author": "방문자 F", "date": "2026-08-15", "verified": true, "content": "박물관까지 하루 코스로 잡기 좋아요." }
+    ]
+  },
+  {
+    "id": "att-tokyo-4", "city": "tokyo", "name": "도쿄 스카이트리", "category": "체험시설",
+    "rating": 4.6, "reviewCount": 1300, "lat": 35.7101, "lng": 139.8107,
+    "description": "일본에서 가장 높은 전망 타워.",
+    "reviews": [
+      { "author": "방문자 G", "date": "2026-02-12", "verified": true, "content": "날씨 좋은 날 후지산까지 보였어요." },
+      { "author": "방문자 H", "date": "2026-07-05", "verified": true, "content": "전망대 아래 쇼핑몰도 볼거리가 많아요." }
+    ]
+  }
+]
