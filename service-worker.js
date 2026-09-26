@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-guidebook-v4';
+const CACHE_NAME = 'travel-guidebook-v5';
 
 const PRECACHE_URLS = [
   './',
@@ -50,9 +50,11 @@ self.addEventListener('activate', (event) => {
 });
 
 // 네트워크를 먼저 시도하고(항상 최신 내용을 보여주기 위해), 실패했을 때만 캐시를 쓴다.
-// ?trip=... 처럼 매번 달라지는 주소는 애초에 미리 저장해둘 수 없으므로,
-// 캐시를 찾을 때는 물음표 뒤 쿼리스트링을 무시하고(ignoreSearch) 같은 페이지의
-// 저장본이라도 찾아서 쓴다. 무엇을 하든 반드시 유효한 Response를 돌려줘서
+// 인터넷이 아예 끊겼을 때(오프라인)도 홈/탐색/상세/찜/일정 화면이 열려야 하므로:
+// - ?trip=... 처럼 매번 달라지는 주소는 애초에 그대로는 저장해둘 수 없다.
+// - 그래서 캐시에서 찾을 때는 물음표 뒤 쿼리스트링을 무시하고(ignoreSearch: true)
+//   같은 이름의 페이지(예: explore.html)가 저장되어 있으면 그걸 대신 돌려준다.
+// 무엇을 하든 반드시 유효한 Response를 돌려줘서
 // "아무 응답도 못 만드는" 상태(=브라우저의 ERR_FAILED)가 나오지 않게 한다.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
